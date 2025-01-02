@@ -83,5 +83,9 @@ EOT
     labels = {
       severity = "warning"
     }
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      mute_timings  = var.notification_settings.mute_timings
+    }
   }
 }
