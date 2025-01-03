@@ -21,7 +21,7 @@ resource "grafana_rule_group" "k8s_container_memory_working_set_bytes" {
       })
 
       relative_time_range {
-        from = 0
+        from = 300
         to   = 0
       }
     }
@@ -53,7 +53,7 @@ resource "grafana_rule_group" "k8s_container_memory_working_set_bytes" {
       })
 
       relative_time_range {
-        from = 0
+        from = 300
         to   = 0
       }
     }
