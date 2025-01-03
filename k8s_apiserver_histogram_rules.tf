@@ -1,4 +1,5 @@
 resource "grafana_rule_group" "kube_apiserver_histogram_rules" {
+  count            = var.kube_apiserver_histogram_rules_enabled ? 1 : 0
   name             = "kube_apiserver_histogram_rules"
   folder_uid       = grafana_folder.prometheus_alerts.uid
   interval_seconds = var.alert_interval_seconds

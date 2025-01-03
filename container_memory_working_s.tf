@@ -1,4 +1,5 @@
 resource "grafana_rule_group" "k8s_container_memory_working_set_bytes" {
+  count            = var.container_memory_working_set_rules_enabled ? 1 : 0
   name             = "k8s_container_memory_working_set_bytes"
   folder_uid       = grafana_folder.prometheus_alerts.uid
   interval_seconds = var.alert_interval_seconds

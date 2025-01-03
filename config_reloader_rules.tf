@@ -1,4 +1,5 @@
 resource "grafana_rule_group" "config_reloader_rules" {
+  count            = var.config_reloader_rules_enabled ? 1 : 0
   org_id           = var.grafana_org_id
   folder_uid       = grafana_folder.prometheus_alerts.uid
   name             = "Config Reloaders"

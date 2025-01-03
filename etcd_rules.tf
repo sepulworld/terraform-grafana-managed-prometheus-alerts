@@ -1,4 +1,5 @@
 resource "grafana_rule_group" "etcd_rules" {
+  count            = var.etcd_rules_enabled ? 1 : 0
   org_id           = 1
   folder_uid       = grafana_folder.prometheus_alerts.uid
   name             = "ETCD Rules"
@@ -498,6 +499,7 @@ EOT
 }
 
 resource "grafana_rule_group" "etcd_slow_requests" {
+  count            = var.etcd_slow_requests_enabled ? 1 : 0
   folder_uid       = grafana_folder.prometheus_alerts.uid
   name             = "ETCD Slow Requests"
   interval_seconds = var.alert_interval_seconds
@@ -670,6 +672,7 @@ EOT
 }
 
 resource "grafana_rule_group" "etcd_disk_rules" {
+  count            = var.etcd_disk_rules_enabled ? 1 : 0
   folder_uid       = grafana_folder.prometheus_alerts.uid 
   name             = "Etcd Disk Alerts"
   interval_seconds = var.alert_interval_seconds
@@ -997,6 +1000,7 @@ EOT
 
 
 resource "grafana_rule_group" "etcd_database_rules" {
+  count            = var.etcd_database_rules_enabled ? 1 : 0
   folder_uid       = grafana_folder.prometheus_alerts.uid 
   name             = "Etcd Database Alerts"
   interval_seconds = var.alert_interval_seconds

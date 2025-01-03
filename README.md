@@ -68,10 +68,26 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_alert_interval_seconds"></a> [alert\_interval\_seconds](#input\_alert\_interval\_seconds) | The interval in seconds to check for alerts | `number` | `60` | no |
+| <a name="input_alertmanager_rules_enabled"></a> [alertmanager\_rules\_enabled](#input\_alertmanager\_rules\_enabled) | Enable or disable the Alertmanager rule | `bool` | `true` | no |
 | <a name="input_config_reloader_rules_enabled"></a> [config\_reloader\_rules\_enabled](#input\_config\_reloader\_rules\_enabled) | Enable or disable the config reload rule | `bool` | `true` | no |
+| <a name="input_container_cpu_usage_rules_enabled"></a> [container\_cpu\_usage\_rules\_enabled](#input\_container\_cpu\_usage\_rules\_enabled) | Enable or disable the container CPU usage rule | `bool` | `true` | no |
+| <a name="input_container_memory_cache_rules_enabled"></a> [container\_memory\_cache\_rules\_enabled](#input\_container\_memory\_cache\_rules\_enabled) | Enable or disable the container memory cache rule | `bool` | `true` | no |
+| <a name="input_container_memory_rss_rules_enabled"></a> [container\_memory\_rss\_rules\_enabled](#input\_container\_memory\_rss\_rules\_enabled) | Enable or disable the container memory RSS rule | `bool` | `true` | no |
+| <a name="input_container_memory_swap_rules_enabled"></a> [container\_memory\_swap\_rules\_enabled](#input\_container\_memory\_swap\_rules\_enabled) | Enable or disable the container memory swap rule | `bool` | `true` | no |
+| <a name="input_container_memory_working_set_rules_enabled"></a> [container\_memory\_working\_set\_rules\_enabled](#input\_container\_memory\_working\_set\_rules\_enabled) | Enable or disable the container memory working set rule | `bool` | `true` | no |
+| <a name="input_container_resource_rules_enabled"></a> [container\_resource\_rules\_enabled](#input\_container\_resource\_rules\_enabled) | Enable or disable the container resource rule | `bool` | `true` | no |
 | <a name="input_datasource_uid"></a> [datasource\_uid](#input\_datasource\_uid) | The ID of the Prometheus datasource to be used, example P220FC6EABAB2D0ZS | `string` | n/a | yes |
+| <a name="input_etcd_database_rules_enabled"></a> [etcd\_database\_rules\_enabled](#input\_etcd\_database\_rules\_enabled) | Enable or disable the etcd database related rule | `bool` | `true` | no |
+| <a name="input_etcd_disk_rules_enabled"></a> [etcd\_disk\_rules\_enabled](#input\_etcd\_disk\_rules\_enabled) | Enable or disable the etcd disk related rule | `bool` | `true` | no |
+| <a name="input_etcd_rules_enabled"></a> [etcd\_rules\_enabled](#input\_etcd\_rules\_enabled) | Enable or disable the etcd rule | `bool` | `true` | no |
+| <a name="input_etcd_slow_requests_enabled"></a> [etcd\_slow\_requests\_enabled](#input\_etcd\_slow\_requests\_enabled) | Enable or disable the etcd slow requests rule | `bool` | `true` | no |
+| <a name="input_general_rules_enabled"></a> [general\_rules\_enabled](#input\_general\_rules\_enabled) | Enable or disable the general rules | `bool` | `true` | no |
 | <a name="input_grafana_org_id"></a> [grafana\_org\_id](#input\_grafana\_org\_id) | The ID of the Grafana organization | `number` | `1` | no |
+| <a name="input_kube_apiserver_availability_rules_enabled"></a> [kube\_apiserver\_availability\_rules\_enabled](#input\_kube\_apiserver\_availability\_rules\_enabled) | Enable or disable the kube-apiserver availability rule | `bool` | `true` | no |
+| <a name="input_kube_apiserver_histogram_rules_enabled"></a> [kube\_apiserver\_histogram\_rules\_enabled](#input\_kube\_apiserver\_histogram\_rules\_enabled) | Enable or disable the kube-apiserver histogram rule | `bool` | `true` | no |
 | <a name="input_notification_settings"></a> [notification\_settings](#input\_notification\_settings) | The notification settings for the alerts | <pre>object({<br/>        contact_point = string<br/>        group_by      = list(string)<br/>        mute_timings  = list(string)<br/>    })</pre> | <pre>{<br/>  "contact_point": "team-infrastructure-notifications",<br/>  "group_by": [<br/>    "namespace",<br/>    "pod"<br/>  ],<br/>  "mute_timings": null<br/>}</pre> | no |
+| <a name="input_prometheus_general_recording_rules_enabled"></a> [prometheus\_general\_recording\_rules\_enabled](#input\_prometheus\_general\_recording\_rules\_enabled) | Enable or disable the Prometheus general recording rule | `bool` | `true` | no |
+| <a name="input_prometheus_general_rules_enabled"></a> [prometheus\_general\_rules\_enabled](#input\_prometheus\_general\_rules\_enabled) | Enable or disable the Prometheus general rule | `bool` | `true` | no |
 | <a name="input_prometheus_namespace"></a> [prometheus\_namespace](#input\_prometheus\_namespace) | The namespace of the Prometheus instance | `string` | `"prometheus"` | no |
 
 ## Outputs

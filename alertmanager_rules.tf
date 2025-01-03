@@ -1,4 +1,5 @@
 resource "grafana_rule_group" "alertmanager_rules" {
+  count            = var.alertmanager_rules_enabled ? 1 : 0
   folder_uid       = grafana_folder.prometheus_alerts.uid
   name             = "Alertmanager Rules"
   interval_seconds = var.alert_interval_seconds

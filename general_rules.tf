@@ -1,4 +1,5 @@
 resource "grafana_rule_group" "target_down_and_watchdog" {
+  count            = var.general_rules_enabled ? 1 : 0
   name             = "General Alerts"
   folder_uid       = "prometheus_alerts"
   interval_seconds = var.alert_interval_seconds

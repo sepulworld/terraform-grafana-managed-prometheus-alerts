@@ -1,4 +1,5 @@
 resource "grafana_rule_group" "kube_apiserver_availability_rules" {
+  count            = var.kube_apiserver_availability_rules_enabled ? 1 : 0
   name             = "kube_apiserver_availability_rules"
   folder_uid       = grafana_folder.prometheus_alerts.uid
   interval_seconds = 180 # 3 minutes
