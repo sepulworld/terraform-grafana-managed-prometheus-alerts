@@ -1,30 +1,33 @@
 resource "grafana_rule_group" "kube_prometheus_general_rules" {
-  count            = var.prometheus_general_rules_enabled ? 1 : 0
   name             = "kube_prometheus_general_rules"
   folder_uid       = grafana_folder.prometheus_alerts.uid
   interval_seconds = var.alert_interval_seconds
 
+  # Rule for count:up1
   rule {
-    name      = "CountUp1"
-    condition = "A"
+    name      = "CountUp1RecordingRule"
+    condition = "A" # Reference to the query node
 
+    # Recording Rule
+    record {
+      from   = "A" # Refers to the data query
+      metric = "count:up1"
+    }
+
+    # Data Query
     data {
       ref_id         = "A"
       datasource_uid = var.datasource_uid
       model = jsonencode({
         "editorMode"    = "code",
-        "expr"          = <<EOT
-count without(instance, pod, node) (up == 1)
-EOT
+        "expr"          = "count without(instance, pod, node) (up == 1)",
         "intervalMs"    = 1000,
         "maxDataPoints" = 43200,
-        "instant"       = true,
         "refId"         = "A"
       })
-
       relative_time_range {
-        from = 300 # 5 minutes
-        to   = 0
+        from = 300 # Query range: last 300 seconds
+        to   = 0   # Current time
       }
     }
 
@@ -33,37 +36,44 @@ EOT
     }
 
     labels = {
-      record = "count:up1"
+      severity = "info"
     }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
 
     notification_settings {
       contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "pod"]
       mute_timings  = var.notification_settings.mute_timings
-      group_by = var.notification_settings.group_by
     }
   }
 
+  # Rule for count:up0
   rule {
-    name      = "CountUp0"
-    condition = "A"
+    name      = "CountUp0RecordingRule"
+    condition = "A" # Reference to the query node
 
+    # Recording Rule
+    record {
+      from   = "A" # Refers to the data query
+      metric = "count:up0"
+    }
+
+    # Data Query
     data {
       ref_id         = "A"
       datasource_uid = var.datasource_uid
       model = jsonencode({
         "editorMode"    = "code",
-        "expr"          = <<EOT
-count without(instance, pod, node) (up == 0)
-EOT
+        "expr"          = "count without(instance, pod, node) (up == 0)",
         "intervalMs"    = 1000,
         "maxDataPoints" = 43200,
-        "instant"       = true,
         "refId"         = "A"
       })
-
       relative_time_range {
-        from = 300 # 5 minutes
-        to   = 0
+        from = 300 # Query range: last 300 seconds
+        to   = 0   # Current time
       }
     }
 
@@ -72,13 +82,16 @@ EOT
     }
 
     labels = {
-      record = "count:up0"
+      severity = "info"
     }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
 
     notification_settings {
       contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "pod"]
       mute_timings  = var.notification_settings.mute_timings
-      group_by = var.notification_settings.group_by
     }
   }
 }
