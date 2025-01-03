@@ -99,52 +99,6 @@ resource "grafana_rule_group" "prometheus_alerts" {
   }
 
     rule {
-    name      = "PrometheusSDRefreshFailure"
-    condition = "A"
-
-    # Data Query
-    data {
-      ref_id         = "A"
-      datasource_uid = var.datasource_uid
-      model = jsonencode({
-        "editorMode"    = "code",
-        "expr"          = "increase(prometheus_sd_refresh_failures_total{job=\"prometheus-kube-prometheus-prometheus\",namespace=\"monitoring\"}[10m]) > 0",
-        "intervalMs"    = 1000,
-        "maxDataPoints" = 43200,
-        "refId"         = "A",
-        "instant"       = true
-      })
-
-      relative_time_range {
-        from = 600 # Last 10 minutes
-        to   = 0
-      }
-    }
-
-    # Alert Settings
-    annotations = {
-      description = "Prometheus {{$labels.namespace}}/{{$labels.pod}} has failed to refresh SD with mechanism {{$labels.mechanism}}."
-      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/prometheus/prometheussdrefreshfailure"
-      summary     = "Failed Prometheus SD refresh."
-    }
-
-    labels = {
-      severity = "warning"
-    }
-
-    no_data_state  = "OK"
-    exec_err_state = "OK"
-
-    for = "20m" # Correctly specifying the alert timing
-
-    # Notification Settings
-    notification_settings {
-      contact_point = var.notification_settings.contact_point
-      group_by      = ["namespace", "pod", "mechanism"]
-      mute_timings  = var.notification_settings.mute_timings
-    }
-  }
-    rule {
     name      = "PrometheusKubernetesListWatchFailures"
     condition = "A"
 
