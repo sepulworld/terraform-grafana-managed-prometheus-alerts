@@ -22,8 +22,8 @@ resource "grafana_rule_group" "k8s_container_memory_swap" {
       })
 
       relative_time_range {
-        from = 0
-        to   = 0
+        from = 300  # Adjusted to 5 minutes ago
+        to   = 0    # Up to now
       }
     }
 
@@ -54,8 +54,8 @@ resource "grafana_rule_group" "k8s_container_memory_swap" {
       })
 
       relative_time_range {
-        from = 0
-        to   = 0
+        from = 300  # Adjusted to 5 minutes ago
+        to   = 0    # Up to now
       }
     }
 
