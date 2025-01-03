@@ -575,7 +575,7 @@ resource "grafana_rule_group" "apiserver_request_error_rates" {
 
   # Rule 1: code_verb:apiserver_request_total:increase1h (4xx codes)
   rule {
-    name      = "ApiserverRequestIncrease1h_4xx"
+    name      = "ApiserverRequestIncrease1h_4xx_2"
     condition = "A"
 
     data {
