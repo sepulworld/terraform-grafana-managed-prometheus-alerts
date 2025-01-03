@@ -69,6 +69,7 @@ resource "grafana_rule_group" "target_down_and_watchdog" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
     for            = "10m"
     no_data_state  = "OK"
@@ -116,6 +117,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
 
     no_data_state  = "OK"
@@ -200,6 +202,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
 
     no_data_state  = "OK"

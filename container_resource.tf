@@ -34,6 +34,7 @@ resource "grafana_rule_group" "k8s_container_resource" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 
@@ -67,6 +68,7 @@ resource "grafana_rule_group" "k8s_container_resource" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 
@@ -100,6 +102,7 @@ resource "grafana_rule_group" "k8s_container_resource" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 
@@ -133,6 +136,7 @@ resource "grafana_rule_group" "k8s_container_resource" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 
@@ -166,6 +170,7 @@ resource "grafana_rule_group" "k8s_container_resource" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 
@@ -199,6 +204,7 @@ resource "grafana_rule_group" "k8s_container_resource" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 
@@ -232,6 +238,7 @@ resource "grafana_rule_group" "k8s_container_resource" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 
@@ -264,6 +271,7 @@ resource "grafana_rule_group" "k8s_container_resource" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 }

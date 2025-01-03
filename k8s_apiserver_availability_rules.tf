@@ -32,6 +32,7 @@ resource "grafana_rule_group" "kube_apiserver_availability_rules" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
 
@@ -68,6 +69,7 @@ resource "grafana_rule_group" "kube_apiserver_availability_rules" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
 
@@ -104,6 +106,7 @@ resource "grafana_rule_group" "kube_apiserver_availability_rules" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
 
@@ -136,6 +139,7 @@ resource "grafana_rule_group" "kube_apiserver_availability_rules" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
 
@@ -168,6 +172,7 @@ resource "grafana_rule_group" "kube_apiserver_availability_rules" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
 
@@ -200,6 +205,7 @@ resource "grafana_rule_group" "kube_apiserver_availability_rules" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
 
@@ -232,6 +238,7 @@ resource "grafana_rule_group" "kube_apiserver_availability_rules" {
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
     # Rule 1: apiserver_request:availability30d (All Verbs)
@@ -294,6 +301,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
 
@@ -351,6 +359,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
     # Rule 1: apiserver_request:availability30d
@@ -401,6 +410,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
 
@@ -440,6 +450,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
     # Rule 1: code_resource:apiserver_request_total:rate5m
@@ -478,6 +489,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
 
@@ -513,6 +525,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
 
@@ -548,6 +561,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
 }
@@ -589,6 +603,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
 
@@ -624,6 +639,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
     # Rule 1: code_verb:apiserver_request_total:increase1h (4xx codes)
@@ -658,6 +674,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 
@@ -692,6 +709,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 }

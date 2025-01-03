@@ -39,6 +39,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+group_by = var.notification_settings.group_by
     }
   }
     rule {
@@ -77,6 +78,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 }

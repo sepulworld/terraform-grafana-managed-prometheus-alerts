@@ -38,6 +38,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 
@@ -76,6 +77,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
     # Rule 1: Disk Read Bytes Rate
@@ -114,6 +116,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 
@@ -153,6 +156,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 
@@ -192,6 +196,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
     rule {
@@ -229,6 +234,7 @@ EOT
     notification_settings {
       contact_point = var.notification_settings.contact_point
       mute_timings  = var.notification_settings.mute_timings
+      group_by = var.notification_settings.group_by
     }
   }
 }

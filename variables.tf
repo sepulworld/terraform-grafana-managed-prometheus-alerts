@@ -40,7 +40,7 @@ variable "notification_settings" {
     default = {
         contact_point = "team-infrastructure-notifications"
         group_by      = ["namespace", "pod"]
-        mute_timings  = []
+        mute_timings  = null
     }
 }
 
