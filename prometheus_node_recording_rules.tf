@@ -1,4 +1,4 @@
-resource "grafana_rule_group" "kube_prometheus_general_rules" {
+resource "grafana_rule_group" "kube_prometheus_general_recording_rules" {
   name             = "kube_prometheus_general_rules"
   folder_uid       = grafana_folder.prometheus_alerts.uid
   interval_seconds = var.alert_interval_seconds
