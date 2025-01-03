@@ -59,8 +59,9 @@ No modules.
 | [grafana_rule_group.k8s_container_resource_limits](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/rule_group) | resource |
 | [grafana_rule_group.kube_apiserver_availability_rules](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/rule_group) | resource |
 | [grafana_rule_group.kube_apiserver_histogram_rules](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/rule_group) | resource |
-| [grafana_rule_group.kube_prometheus_general_recording_rules](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/rule_group) | resource |
+| [grafana_rule_group.kube_prometheus_general_alerts](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/rule_group) | resource |
 | [grafana_rule_group.kube_prometheus_general_rules](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/rule_group) | resource |
+| [grafana_rule_group.prometheus_alerts](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/rule_group) | resource |
 | [grafana_rule_group.target_down_and_watchdog](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/rule_group) | resource |
 
 ## Inputs
@@ -87,6 +88,7 @@ No modules.
 | <a name="input_kube_apiserver_availability_rules_enabled"></a> [kube\_apiserver\_availability\_rules\_enabled](#input\_kube\_apiserver\_availability\_rules\_enabled) | Enable or disable the kube-apiserver availability rule | `bool` | `true` | no |
 | <a name="input_kube_apiserver_histogram_rules_enabled"></a> [kube\_apiserver\_histogram\_rules\_enabled](#input\_kube\_apiserver\_histogram\_rules\_enabled) | Enable or disable the kube-apiserver histogram rule | `bool` | `true` | no |
 | <a name="input_notification_settings"></a> [notification\_settings](#input\_notification\_settings) | The notification settings for the alerts | <pre>object({<br/>        contact_point = string<br/>        group_by      = list(string)<br/>        mute_timings  = list(string)<br/>    })</pre> | <pre>{<br/>  "contact_point": "team-infrastructure-notifications",<br/>  "group_by": [<br/>    "namespace",<br/>    "pod"<br/>  ],<br/>  "mute_timings": null<br/>}</pre> | no |
+| <a name="input_prometheus_alerting_rules_enabled"></a> [prometheus\_alerting\_rules\_enabled](#input\_prometheus\_alerting\_rules\_enabled) | Enable or disable the Prometheus alerting rule | `bool` | `true` | no |
 | <a name="input_prometheus_general_recording_rules_enabled"></a> [prometheus\_general\_recording\_rules\_enabled](#input\_prometheus\_general\_recording\_rules\_enabled) | Enable or disable the Prometheus general recording rule | `bool` | `true` | no |
 | <a name="input_prometheus_general_rules_enabled"></a> [prometheus\_general\_rules\_enabled](#input\_prometheus\_general\_rules\_enabled) | Enable or disable the Prometheus general rule | `bool` | `true` | no |
 | <a name="input_prometheus_namespace"></a> [prometheus\_namespace](#input\_prometheus\_namespace) | The namespace of the Prometheus instance | `string` | `"prometheus"` | no |
