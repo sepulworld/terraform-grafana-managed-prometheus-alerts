@@ -657,6 +657,7 @@ EOT
 
     rule {
     name      = "PrometheusOutOfOrderTimestamps"
+    no_data_state  = "OK"
     condition = "A"
 
     data {
@@ -691,6 +692,7 @@ EOT
     rule {
     name      = "PrometheusRemoteStorageFailures"
     condition = "A"
+    no_data_state = "OK"
 
     data {
       ref_id         = "A"
