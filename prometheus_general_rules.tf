@@ -1,4 +1,5 @@
 resource "grafana_rule_group" "kube_prometheus_general_alerts" {
+  count            = var.prometheus_general_rules_enabled ? 1 : 0
   name             = "kube_prometheus_general_alerts"
   folder_uid       = grafana_folder.prometheus_alerts.uid
   interval_seconds = var.alert_interval_seconds
