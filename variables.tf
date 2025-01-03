@@ -80,7 +80,11 @@ variable "general_rules_enabled" {
   description = "Enable or disable the general rules"
   default = true
 }
-
+variable "apiserver_request_error_rates_enabled" {
+  type = bool
+  description = "Enable or disable the kube-apiserver request error rate rule"
+  default = true
+}
 variable "kube_apiserver_availability_rules_enabled" {
   type = bool
   description = "Enable or disable the kube-apiserver availability rule"

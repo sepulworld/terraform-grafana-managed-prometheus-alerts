@@ -568,6 +568,7 @@ group_by = var.notification_settings.group_by
 }
 
 resource "grafana_rule_group" "apiserver_request_error_rates" {
+  count            = var.apiserver_request_error_rates_enabled ? 1 : 0
   name             = "apiserver_request_error_rates"
   folder_uid       = grafana_folder.prometheus_alerts.uid
   interval_seconds = 3600 # 1 hour
