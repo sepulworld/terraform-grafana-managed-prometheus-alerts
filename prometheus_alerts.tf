@@ -676,6 +676,7 @@ EOT
     }
 
     annotations = {
+      summary     = "Prometheus is dropping samples with timestamps arriving out of order."
       description = "Prometheus {{$labels.namespace}}/{{$labels.pod}} is dropping {{ printf \"%.4g\" $value }} samples/s with timestamps arriving out of order."
       runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/prometheus/prometheusoutofordertimestamps"
     }
@@ -720,6 +721,7 @@ EOT
     }
 
     annotations = {
+      summary     = "Prometheus is failing to send samples to remote storage."
       description = "Prometheus {{$labels.namespace}}/{{$labels.pod}} failed to send {{ printf \"%.1f\" $value }}% of the samples to {{ $labels.remote_name}}:{{ $labels.url }}"
       runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/prometheus/prometheusremotestoragefailures"
     }
