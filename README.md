@@ -69,6 +69,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_alert_interval_seconds"></a> [alert\_interval\_seconds](#input\_alert\_interval\_seconds) | The interval in seconds to check for alerts | `number` | `60` | no |
 | <a name="input_alertmanager_rules_enabled"></a> [alertmanager\_rules\_enabled](#input\_alertmanager\_rules\_enabled) | Enable or disable the Alertmanager rule | `bool` | `true` | no |
+| <a name="input_apiserver_request_error_rates_enabled"></a> [apiserver\_request\_error\_rates\_enabled](#input\_apiserver\_request\_error\_rates\_enabled) | Enable or disable the kube-apiserver request error rate rule | `bool` | `true` | no |
 | <a name="input_config_reloader_rules_enabled"></a> [config\_reloader\_rules\_enabled](#input\_config\_reloader\_rules\_enabled) | Enable or disable the config reload rule | `bool` | `true` | no |
 | <a name="input_container_cpu_usage_rules_enabled"></a> [container\_cpu\_usage\_rules\_enabled](#input\_container\_cpu\_usage\_rules\_enabled) | Enable or disable the container CPU usage rule | `bool` | `true` | no |
 | <a name="input_container_memory_cache_rules_enabled"></a> [container\_memory\_cache\_rules\_enabled](#input\_container\_memory\_cache\_rules\_enabled) | Enable or disable the container memory cache rule | `bool` | `true` | no |
