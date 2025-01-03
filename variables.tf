@@ -109,7 +109,7 @@ variable "prometheus_general_recording_rules_enabled" {
   default = true
 }
 
-variable "prometheus_alerting_rules_enabled" {
+variable "prometheus_alerts_enabled" {
   type = bool
   description = "Enable or disable the Prometheus alerting rule"
   default = true
