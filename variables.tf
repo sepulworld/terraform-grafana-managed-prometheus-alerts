@@ -31,10 +31,7 @@ variable "notification_settings" {
     type = object({
         contact_point = string
         group_by      = list(string)
-        mute_timings  = list(object({
-            start_time = string
-            end_time   = string
-        }))
+        mute_timings  = list(string)
     })
     description = "The notification settings for the alerts"
     default = {
@@ -43,4 +40,3 @@ variable "notification_settings" {
         mute_timings  = null
     }
 }
-
