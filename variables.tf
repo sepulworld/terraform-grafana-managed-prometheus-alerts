@@ -139,13 +139,13 @@ variable "kube_state_metrics_errors_alerts_enabled" {
   default = true
 }
 
-variable "node_network_interface_flapping_rules_enabled" {
+variable "node_network_interface_alerts_enabled" {
   type = bool
   description = "Enable or disable the node network interface flapping rule"
   default = true
 }
 
-variable "node_filesystem_space_filling_up_rules_enabled" {
+variable "node_exporter_alerts_enabled" {
   type = bool
   description = "Enable or disable the node filesystem space filling up rule"
   default = true

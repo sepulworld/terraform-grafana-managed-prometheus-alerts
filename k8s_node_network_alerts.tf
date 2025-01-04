@@ -1,5 +1,5 @@
 resource "grafana_rule_group" "node_network_interface_flapping" {
-  count            = var.node_network_interface_flapping_rules_enabled ? 1 : 0
+  count            = var.node_network_interface_alerts_enabled ? 1 : 0
   name             = "node_network_interface_flapping"
   folder_uid       = grafana_folder.prometheus_alerts.uid
   interval_seconds = var.alert_interval_seconds
