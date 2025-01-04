@@ -259,7 +259,7 @@ EOT
         "refId"         = "A"
       })
       relative_time_range {
-        from = 0
+        from = 300
         to   = 0
       }
     }
@@ -315,7 +315,7 @@ EOT
         "refId"         = "A"
       })
       relative_time_range {
-        from = 0
+        from = 300
         to   = 0
       }
     }
