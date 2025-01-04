@@ -339,4 +339,47 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+  rule {
+    name      = "KubePersistentVolumeErrors"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+kube_persistentvolume_status_phase{phase=~"Failed|Pending",job="kube-state-metrics"} > 0
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 300
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "The persistent volume {{ $labels.persistentvolume }} {{ with $labels.cluster -}} on Cluster {{ . }} {{- end }} has status {{ $labels.phase }}."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumeerrors"
+      summary     = "PersistentVolume is having issues with provisioning."
+    }
+
+    labels = {
+      severity = "critical"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+    for           = "5m"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["persistentvolume"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
 }
