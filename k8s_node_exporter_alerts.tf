@@ -297,4 +297,100 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+
+    # Alert: Filesystem has less than 5% inodes left
+  rule {
+    name      = "NodeFilesystemAlmostOutOfFilesWarning"
+    condition = "A"
+
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+(
+  node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_files{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 5
+and
+  node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+)
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 3600 # Last 1 hour
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Filesystem on {{ $labels.device }}, mounted on {{ $labels.mountpoint }}, at {{ $labels.instance }} has only {{ printf \"%.2f\" $value }}% available inodes left."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodefilesystemalmostoutoffiles"
+      summary     = "Filesystem has less than 5% inodes left."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+    for            = "1h"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["device", "mountpoint", "instance"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
+
+  # Alert: Filesystem has less than 3% inodes left
+  rule {
+    name      = "NodeFilesystemAlmostOutOfFilesCritical"
+    condition = "A"
+
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+(
+  node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_files{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 3
+and
+  node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+)
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 3600 # Last 1 hour
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Filesystem on {{ $labels.device }}, mounted on {{ $labels.mountpoint }}, at {{ $labels.instance }} has only {{ printf \"%.2f\" $value }}% available inodes left."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodefilesystemalmostoutoffiles"
+      summary     = "Filesystem has less than 3% inodes left."
+    }
+
+    labels = {
+      severity = "critical"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+    for            = "1h"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["device", "mountpoint", "instance"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
 }
