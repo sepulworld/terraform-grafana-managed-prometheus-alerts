@@ -223,14 +223,8 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
-}
 
-resource "grafana_rule_group" "kube_persistent_volume_inodes_alerts" {
-  name             = "kube_persistent_volume_inodes_alerts"
-  folder_uid       = grafana_folder.prometheus_alerts.uid
-  interval_seconds = var.alert_interval_seconds
-
-  # Critical Alert: PersistentVolume inodes filling up
+   # Critical Alert: PersistentVolume inodes filling up
   rule {
     name      = "KubePersistentVolumeInodesFillingUpCritical"
     condition = "A"
