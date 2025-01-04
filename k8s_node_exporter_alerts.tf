@@ -393,4 +393,92 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+
+    # Alert: NodeNetworkReceiveErrs
+  rule {
+    name      = "NodeNetworkReceiveErrs"
+    condition = "A"
+
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+rate(node_network_receive_errs_total{job="node-exporter"}[2m]) / rate(node_network_receive_packets_total{job="node-exporter"}[2m]) > 0.01
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 3600 # Last 1 hour
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "{{ $labels.instance }} interface {{ $labels.device }} has encountered {{ printf \"%.0f\" $value }} receive errors in the last two minutes."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodenetworkreceiveerrs"
+      summary     = "Network interface is reporting many receive errors."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+    for            = "1h"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["instance", "device"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
+
+  # Alert: NodeNetworkTransmitErrs
+  rule {
+    name      = "NodeNetworkTransmitErrs"
+    condition = "A"
+
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+rate(node_network_transmit_errs_total{job="node-exporter"}[2m]) / rate(node_network_transmit_packets_total{job="node-exporter"}[2m]) > 0.01
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 3600 # Last 1 hour
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "{{ $labels.instance }} interface {{ $labels.device }} has encountered {{ printf \"%.0f\" $value }} transmit errors in the last two minutes."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodenetworktransmiterrs"
+      summary     = "Network interface is reporting many transmit errors."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+    for            = "1h"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["instance", "device"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
 }
