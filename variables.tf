@@ -139,6 +139,12 @@ variable "kube_state_metrics_errors_alerts_enabled" {
   default = true
 }
 
+variable "node_network_interface_flapping_rules_enabled" {
+  type = bool
+  description = "Enable or disable the node network interface flapping rule"
+  default = true
+}
+
 variable "grafana_org_id" {
   type = number
   description = "The ID of the Grafana organization"
