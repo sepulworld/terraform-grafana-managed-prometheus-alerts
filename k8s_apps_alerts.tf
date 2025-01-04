@@ -498,4 +498,93 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+
+    rule {
+    name      = "KubeDaemonSetNotScheduled"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics", namespace=~".*"}
+  -
+kube_daemonset_status_current_number_scheduled{job="kube-state-metrics", namespace=~".*"} > 0
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 600 # Last 10 minutes
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are not scheduled."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubedaemonsetnotscheduled"
+      summary     = "DaemonSet pods are not scheduled."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "10m"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "daemonset"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
+
+  # KubeDaemonSetMisScheduled Alert
+  rule {
+    name      = "KubeDaemonSetMisScheduled"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+kube_daemonset_status_number_misscheduled{job="kube-state-metrics", namespace=~".*"} > 0
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 900 # Last 15 minutes
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "{{ $value }} Pods of DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} are running where they are not supposed to run."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubedaemonsetmisscheduled"
+      summary     = "DaemonSet pods are misscheduled."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "15m"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "daemonset"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
 }
