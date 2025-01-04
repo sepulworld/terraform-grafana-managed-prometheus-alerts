@@ -678,4 +678,112 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+  rule {
+    name      = "KubeHpaReplicasMismatch"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+(
+  kube_horizontalpodautoscaler_status_desired_replicas{job="kube-state-metrics", namespace=~".*"}
+    !=
+  kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~".*"}
+)
+  and
+(
+  kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~".*"}
+    >
+  kube_horizontalpodautoscaler_spec_min_replicas{job="kube-state-metrics", namespace=~".*"}
+)
+  and
+(
+  kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~".*"}
+    <
+  kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics", namespace=~".*"}
+)
+  and
+(
+  changes(kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~".*"}[15m]) == 0
+)
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 0
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler }} has not matched the desired number of replicas for longer than 15 minutes."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubehpareplicasmismatch"
+      summary     = "HPA has not matched desired number of replicas."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "15m"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "horizontalpodautoscaler"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
+
+  # KubeHpaMaxedOut Alert
+  rule {
+    name      = "KubeHpaMaxedOut"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~".*"}
+  ==
+kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics", namespace=~".*"}
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 0
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler }} has been running at max replicas for longer than 15 minutes."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubehpamaxedout"
+      summary     = "HPA is running at max replicas."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "15m"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "horizontalpodautoscaler"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
 }
