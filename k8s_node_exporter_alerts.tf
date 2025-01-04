@@ -481,4 +481,75 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+
+    rule {
+    name      = "NodeHighNumberConntrackEntriesUsed"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "(node_nf_conntrack_entries{job=\"node-exporter\"} / node_nf_conntrack_entries_limit) > 0.75",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 300
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "{{ $value | humanizePercentage }} of conntrack entries are used."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodehighnumberconntrackentriesused"
+      summary     = "Number of conntrack are getting close to the limit."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
+    rule {
+    name      = "NodeTextFileCollectorScrapeError"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "node_textfile_scrape_error{job=\"node-exporter\"} == 1",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 300
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Node Exporter text file collector on {{ $labels.instance }} failed to scrape."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodetextfilecollectorscrapeerror"
+      summary     = "Node Exporter text file collector failed to scrape."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
 }
