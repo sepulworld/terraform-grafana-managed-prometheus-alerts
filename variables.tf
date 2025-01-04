@@ -127,6 +127,12 @@ variable "kubernetes_apps_alerts_enabled" {
   default = true
 }
 
+variable "kubernetes_storage_alerts_enabled" {
+  type = bool
+  description = "Enable or disable the Kubernetes storage alert rule"
+  default = true
+}
+
 variable "grafana_org_id" {
   type = number
   description = "The ID of the Grafana organization"
