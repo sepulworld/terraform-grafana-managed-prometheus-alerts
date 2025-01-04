@@ -133,6 +133,12 @@ variable "kubernetes_storage_alerts_enabled" {
   default = true
 }
 
+variable "kube_state_metrics_errors_alerts_enabled" {
+  type = bool
+  description = "Enable or disable the kube-state-metrics errors alert rule"
+  default = true
+}
+
 variable "grafana_org_id" {
   type = number
   description = "The ID of the Grafana organization"
