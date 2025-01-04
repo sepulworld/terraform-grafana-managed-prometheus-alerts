@@ -587,4 +587,95 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+
+    rule {
+    name      = "KubeJobNotCompleted"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+time() - max by (namespace, job_name, cluster) (
+  kube_job_status_start_time{job="kube-state-metrics", namespace=~".*"}
+  and
+  kube_job_status_active{job="kube-state-metrics", namespace=~".*"} > 0
+) > 43200
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 0
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Job {{ $labels.namespace }}/{{ $labels.job_name }} is taking more than 12 hours to complete."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubejobnotcompleted"
+      summary     = "Job did not complete in time."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "0s"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "job_name"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
+
+  # KubeJobFailed Alert
+  rule {
+    name      = "KubeJobFailed"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+kube_job_failed{job="kube-state-metrics", namespace=~".*"} > 0
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 900 # Last 15 minutes
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Job {{ $labels.namespace }}/{{ $labels.job_name }} failed to complete. Removing failed job after investigation should clear this alert."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubejobfailed"
+      summary     = "Job failed to complete."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "15m"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "job_name"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
 }
