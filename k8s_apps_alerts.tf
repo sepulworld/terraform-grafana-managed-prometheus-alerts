@@ -388,4 +388,114 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+
+
+  rule {
+    name      = "KubeDaemonSetRolloutStuck"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+(
+  (
+    kube_daemonset_status_current_number_scheduled{job="kube-state-metrics", namespace=~".*"}
+     !=
+    kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics", namespace=~".*"}
+  ) or (
+    kube_daemonset_status_number_misscheduled{job="kube-state-metrics", namespace=~".*"}
+     !=
+    0
+  ) or (
+    kube_daemonset_status_updated_number_scheduled{job="kube-state-metrics", namespace=~".*"}
+     !=
+    kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics", namespace=~".*"}
+  ) or (
+    kube_daemonset_status_number_available{job="kube-state-metrics", namespace=~".*"}
+     !=
+    kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics", namespace=~".*"}
+  )
+) and (
+  changes(kube_daemonset_status_updated_number_scheduled{job="kube-state-metrics", namespace=~".*"}[5m])
+    ==
+  0
+)
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 900 # Last 15 minutes
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} has not finished or progressed for at least 15 minutes."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubedaemonsetrolloutstuck"
+      summary     = "DaemonSet rollout is stuck."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "15m"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "daemonset"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
+
+  # KubeContainerWaiting Alert
+  rule {
+    name      = "KubeContainerWaiting"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+sum by (namespace, pod, container, cluster) (kube_pod_container_status_waiting_reason{job="kube-state-metrics", namespace=~".*"}) > 0
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 3600 # Last 1 hour
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "pod/{{ $labels.pod }} in namespace {{ $labels.namespace }} on container {{ $labels.container }} has been in waiting state for longer than 1 hour."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubecontainerwaiting"
+      summary     = "Pod container waiting longer than 1 hour."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "1h"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "pod", "container"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
 }
