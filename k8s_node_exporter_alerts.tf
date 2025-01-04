@@ -197,4 +197,104 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+
+    # Alert: Filesystem predicted to run out of inodes within the next 24 hours
+  rule {
+    name      = "NodeFilesystemFilesFillingUpSlow"
+    condition = "A"
+
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+(
+  node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_files{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 40
+and
+  predict_linear(node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""}[6h], 24*60*60) < 0
+and
+  node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+)
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 3600 # Last 1 hour
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Filesystem on {{ $labels.device }}, mounted on {{ $labels.mountpoint }}, at {{ $labels.instance }} has only {{ printf \"%.2f\" $value }}% available inodes left and is filling up."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodefilesystemfilesfillingup"
+      summary     = "Filesystem is predicted to run out of inodes within the next 24 hours."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+    for            = "1h"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["device", "mountpoint", "instance"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
+
+  # Alert: Filesystem predicted to run out of inodes within the next 4 hours
+  rule {
+    name      = "NodeFilesystemFilesFillingUpFast"
+    condition = "A"
+
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+(
+  node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""} / node_filesystem_files{job="node-exporter",fstype!="",mountpoint!=""} * 100 < 20
+and
+  predict_linear(node_filesystem_files_free{job="node-exporter",fstype!="",mountpoint!=""}[6h], 4*60*60) < 0
+and
+  node_filesystem_readonly{job="node-exporter",fstype!="",mountpoint!=""} == 0
+)
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 3600 # Last 1 hour
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Filesystem on {{ $labels.device }}, mounted on {{ $labels.mountpoint }}, at {{ $labels.instance }} has only {{ printf \"%.2f\" $value }}% available inodes left and is filling up fast."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodefilesystemfilesfillingup"
+      summary     = "Filesystem is predicted to run out of inodes within the next 4 hours."
+    }
+
+    labels = {
+      severity = "critical"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+    for            = "1h"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["device", "mountpoint", "instance"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
 }
