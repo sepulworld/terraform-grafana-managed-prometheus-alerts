@@ -285,4 +285,107 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+
+    rule {
+    name      = "KubeStatefulSetGenerationMismatch"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+kube_statefulset_status_observed_generation{job="kube-state-metrics", namespace=~".*"}
+  !=
+kube_statefulset_metadata_generation{job="kube-state-metrics", namespace=~".*"}
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 300 # Last 5 minutes
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "StatefulSet generation for {{ $labels.namespace }}/{{ $labels.statefulset }} does not match, this indicates that the StatefulSet has failed but has not been rolled back."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubestatefulsetgenerationmismatch"
+      summary     = "StatefulSet generation mismatch due to possible roll-back"
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "15m"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "statefulset"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
+
+  # KubeStatefulSetUpdateNotRolledOut Alert
+  rule {
+    name      = "KubeStatefulSetUpdateNotRolledOut"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+(
+  max by (namespace, statefulset) (
+    kube_statefulset_status_current_revision{job="kube-state-metrics", namespace=~".*"}
+      unless
+    kube_statefulset_status_update_revision{job="kube-state-metrics", namespace=~".*"}
+  )
+    *
+  (
+    kube_statefulset_replicas{job="kube-state-metrics", namespace=~".*"}
+      !=
+    kube_statefulset_status_replicas_updated{job="kube-state-metrics", namespace=~".*"}
+  )
+) and (
+  changes(kube_statefulset_status_replicas_updated{job="kube-state-metrics", namespace=~".*"}[5m]) == 0
+)
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 300 # Last 5 minutes
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} update has not been rolled out."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubestatefulsetupdatenotrolledout"
+      summary     = "StatefulSet update has not been rolled out."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "15m"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "statefulset"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
 }
