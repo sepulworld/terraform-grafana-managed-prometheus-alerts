@@ -194,4 +194,95 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+
+    rule {
+    name      = "KubeDeploymentRolloutStuck"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+kube_deployment_status_condition{condition="Progressing", status="false", job="kube-state-metrics", namespace=~".*"} != 0
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 300 # Last 5 minutes
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Rollout of deployment {{ $labels.namespace }}/{{ $labels.deployment }} is not progressing for longer than 15 minutes."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubedeploymentrolloutstuck"
+      summary     = "Deployment rollout is not progressing."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "15m"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "deployment"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
+
+  # KubeStatefulSetReplicasMismatch Alert
+  rule {
+    name      = "KubeStatefulSetReplicasMismatch"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
+(
+  kube_statefulset_status_replicas_ready{job="kube-state-metrics", namespace=~".*"} != kube_statefulset_status_replicas{job="kube-state-metrics", namespace=~".*"}
+) and (
+  changes(kube_statefulset_status_replicas_updated{job="kube-state-metrics", namespace=~".*"}[10m]) == 0
+)
+EOT
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 300 # Last 5 minutes
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has not matched the expected number of replicas for longer than 15 minutes."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubestatefulsetreplicasmismatch"
+      summary     = "StatefulSet has not matched the expected number of replicas."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "15m"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "statefulset"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
+  }
 }
