@@ -771,53 +771,8 @@ EOT
     no_data_state  = "OK"
     exec_err_state = "OK"
   }
-}
 
-resource "grafana_rule_group" "node_system_saturation_warning" {
-  name             = "node_system_saturation_warning_alerts"
-  folder_uid       = grafana_folder.prometheus_alerts.uid
-  interval_seconds = var.alert_interval_seconds
-
-  rule {
-    name      = "NodeSystemSaturationWarning"
-    condition = "A"
-
-    # Data Query
-    data {
-      ref_id         = "A"
-      datasource_uid = var.datasource_uid
-      model = jsonencode({
-        "editorMode"    = "code",
-        "expr"          = "node_load1{job=\"node-exporter\"} / count without (cpu, mode) (node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\"}) > 2",
-        "intervalMs"    = 1000,
-        "maxDataPoints" = 43200,
-        "instant"       = true,
-        "refId"         = "A"
-      })
-      relative_time_range {
-        from = 900
-        to   = 0
-      }
-    }
-
-    annotations = {
-      description = <<EOT
-System load per core at {{ $labels.instance }} has been above 2 for the last 15 minutes, is currently at {{ printf "%.2f" $value }}.
-This might indicate this instance resources saturation and can cause it becoming unresponsive.
-EOT
-      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodesystemsaturation"
-      summary     = "System saturated, load per core is very high."
-    }
-
-    labels = {
-      severity = "warning"
-    }
-
-    no_data_state  = "OK"
-    exec_err_state = "OK"
-  }
-
-    rule {
+   rule {
     name      = "NodeMemoryMajorPagesFaultsWarning"
     condition = "A"
 
