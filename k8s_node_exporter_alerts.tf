@@ -552,4 +552,453 @@ EOT
     no_data_state  = "OK"
     exec_err_state = "OK"
   }
+
+    rule {
+    name      = "NodeClockNotSynchronising"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "min_over_time(node_timex_sync_status{job=\"node-exporter\"}[5m]) == 0 and node_timex_maxerror_seconds{job=\"node-exporter\"} >= 16",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 600
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Clock at {{ $labels.instance }} is not synchronising. Ensure NTP is configured on this host."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodeclocknotsynchronising"
+      summary     = "Clock not synchronising."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
+
+    rule {
+    name      = "NodeClockSkewDetected"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "(node_timex_offset_seconds{job=\"node-exporter\"} > 0.05 and deriv(node_timex_offset_seconds{job=\"node-exporter\"}[5m]) >= 0) or (node_timex_offset_seconds{job=\"node-exporter\"} < -0.05 and deriv(node_timex_offset_seconds{job=\"node-exporter\"}[5m]) <= 0)",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 600
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Clock at {{ $labels.instance }} is out of sync by more than 0.05s. Ensure NTP is configured correctly on this host."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodeclockskewdetected"
+      summary     = "Clock skew detected."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
+
+    rule {
+    name      = "NodeRAIDDegraded"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "node_md_disks_required{job=\"node-exporter\",device=~\"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)\"} - ignoring (state) (node_md_disks{state=\"active\",job=\"node-exporter\",device=~\"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)\"}) > 0",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 900
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "RAID array '{{ $labels.device }}' at {{ $labels.instance }} is in degraded state due to one or more disks failures. Number of spare drives is insufficient to fix issue automatically."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/noderaiddegraded"
+      summary     = "RAID Array is degraded."
+    }
+
+    labels = {
+      severity = "critical"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
+
+    rule {
+    name      = "NodeRAIDDiskFailure"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "node_md_disks{state=\"failed\",job=\"node-exporter\",device=~\"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)\"} > 0",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 900
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "At least one device in RAID array at {{ $labels.instance }} failed. Array '{{ $labels.device }}' needs attention and possibly a disk swap."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/noderaiddiskfailure"
+      summary     = "Failed device in RAID array."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
+
+    rule {
+    name      = "NodeCPUHighUsageInfo"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode!=\"idle\"}[2m]))) * 100 > 90",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 900
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "CPU usage at {{ $labels.instance }} has been above 90% for the last 15 minutes, is currently at {{ printf \"%.2f\" $value }}%."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodecpuhighusage"
+      summary     = "High CPU usage."
+    }
+
+    labels = {
+      severity = "info"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
+
+    rule {
+    name      = "NodeSystemSaturationWarning"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "node_load1{job=\"node-exporter\"} / count without (cpu, mode) (node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\"}) > 2",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 900
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = <<EOT
+System load per core at {{ $labels.instance }} has been above 2 for the last 15 minutes, is currently at {{ printf "%.2f" $value }}.
+This might indicate this instance resources saturation and can cause it becoming unresponsive.
+EOT
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodesystemsaturation"
+      summary     = "System saturated, load per core is very high."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
+}
+
+resource "grafana_rule_group" "node_system_saturation_warning" {
+  name             = "node_system_saturation_warning_alerts"
+  folder_uid       = grafana_folder.prometheus_alerts.uid
+  interval_seconds = var.alert_interval_seconds
+
+  rule {
+    name      = "NodeSystemSaturationWarning"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "node_load1{job=\"node-exporter\"} / count without (cpu, mode) (node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\"}) > 2",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 900
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = <<EOT
+System load per core at {{ $labels.instance }} has been above 2 for the last 15 minutes, is currently at {{ printf "%.2f" $value }}.
+This might indicate this instance resources saturation and can cause it becoming unresponsive.
+EOT
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodesystemsaturation"
+      summary     = "System saturated, load per core is very high."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
+
+    rule {
+    name      = "NodeMemoryMajorPagesFaultsWarning"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "rate(node_vmstat_pgmajfault{job=\"node-exporter\"}[5m]) > 500",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 900
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = <<EOT
+Memory major pages are occurring at very high rate at {{ $labels.instance }}, 500 major page faults per second for the last 15 minutes, is currently at {{ printf "%.2f" $value }}.
+Please check that there is enough memory available at this instance.
+EOT
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodememorymajorpagesfaults"
+      summary     = "Memory major page faults are occurring at very high rate."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
+
+    rule {
+    name      = "NodeMemoryHighUtilizationWarning"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "100 - (node_memory_MemAvailable_bytes{job=\"node-exporter\"} / node_memory_MemTotal_bytes{job=\"node-exporter\"} * 100) > 90",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 900
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = <<EOT
+Memory is filling up at {{ $labels.instance }}, has been above 90% for the last 15 minutes, is currently at {{ printf "%.2f\" $value }}%.
+EOT
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodememoryhighutilization"
+      summary     = "Host is running out of memory."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
+    rule {
+    name      = "NodeDiskIOSaturationWarning"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "rate(node_disk_io_time_weighted_seconds_total{job=\"node-exporter\", device=~\"(/dev/)?(mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|md.+|dasd.+)\"}[5m]) > 10",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 1800
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = <<EOT
+Disk IO queue (aqu-sq) is high on {{ $labels.device }} at {{ $labels.instance }}, has been above 10 for the last 30 minutes, is currently at {{ printf "%.2f" $value }}.
+This symptom might indicate disk saturation.
+EOT
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodediskiosaturation"
+      summary     = "Disk IO queue is high."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
+    rule {
+    name      = "NodeSystemdServiceFailedWarning"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "node_systemd_unit_state{job=\"node-exporter\", state=\"failed\"} == 1",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 300
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Systemd service {{ $labels.name }} has entered failed state at {{ $labels.instance }}"
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodesystemdservicefailed"
+      summary     = "Systemd service has entered failed state."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
+    rule {
+    name      = "NodeBondingDegradedWarning"
+    condition = "A"
+
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = "(node_bonding_slaves - node_bonding_active) != 0",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "instant"       = true,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 300
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Bonding interface {{ $labels.master }} on {{ $labels.instance }} is in degraded state due to one or more slave failures."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodebondingdegraded"
+      summary     = "Bonding interface is degraded"
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state  = "OK"
+    exec_err_state = "OK"
+  }
 }
