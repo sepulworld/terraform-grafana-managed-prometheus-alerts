@@ -743,7 +743,7 @@ EOT
       datasource_uid = var.datasource_uid
       model = jsonencode({
         "editorMode"    = "code",
-        "expr"          = "node_load1{job=\"node-exporter\"} / count without (cpu, mode) (node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\"}) > 2",
+        "expr"          = "node_load1{job=\"node-exporter\"} / count without (cpu, mode) (node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\"}) > 5",
         "intervalMs"    = 1000,
         "maxDataPoints" = 43200,
         "instant"       = true,
