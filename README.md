@@ -1,6 +1,6 @@
-# terraform-grafana-managed-prometheus-rules
+# terraform-grafana-managed-prometheus-alerts
 
-This project provides Terraform configurations for managing Prometheus rules in Grafana Cloud. It allows users to define and deploy alerting and recording rules for Prometheus using Terraform, ensuring consistent and version-controlled rule management.
+This project provides Terraform configurations for managing Prometheus alerts and rules in Grafana Cloud. It allows users to define and deploy alerting and recording rules for Prometheus using Terraform, ensuring consistent and version-controlled rule management.
 
 The default Prometheus rules that come with prometheus-operator are not version-controlled and don't tie in nicely with Grafana managed alerts. This project aims to provide a solution for managing Prometheus rules in Grafana Cloud using Terraform.
 
