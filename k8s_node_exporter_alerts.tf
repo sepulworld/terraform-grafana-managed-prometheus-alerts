@@ -707,7 +707,7 @@ EOT
       datasource_uid = var.datasource_uid
       model = jsonencode({
         "editorMode"    = "code",
-        "expr"          = "sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode!=\"idle\"}[2m]))) * 100 > 90",
+        "expr"          = "sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode!=\"idle\"}[2m]))) * 100 > 96",
         "intervalMs"    = 1000,
         "maxDataPoints" = 43200,
         "instant"       = true,
@@ -720,7 +720,7 @@ EOT
     }
 
     annotations = {
-      description = "CPU usage at {{ $labels.instance }} has been above 90% for the last 15 minutes, is currently at {{ printf \"%.2f\" $value }}%."
+      description = "CPU usage at {{ $labels.instance }} has been above 96% for the last 15 minutes, is currently at {{ printf \"%.2f\" $value }}%."
       runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodecpuhighusage"
       summary     = "High CPU usage."
     }
@@ -821,7 +821,7 @@ EOT
       datasource_uid = var.datasource_uid
       model = jsonencode({
         "editorMode"    = "code",
-        "expr"          = "100 - (node_memory_MemAvailable_bytes{job=\"node-exporter\"} / node_memory_MemTotal_bytes{job=\"node-exporter\"} * 100) > 90",
+        "expr"          = "100 - (node_memory_MemAvailable_bytes{job=\"node-exporter\"} / node_memory_MemTotal_bytes{job=\"node-exporter\"} * 100) > 92",
         "intervalMs"    = 1000,
         "maxDataPoints" = 43200,
         "instant"       = true,
@@ -835,7 +835,7 @@ EOT
 
     annotations = {
       description = <<EOT
-Memory is filling up at {{ $labels.instance }}, has been above 90% for the last 15 minutes, is currently at {{ printf "%.2f\" $value }}%.
+Memory is filling up at {{ $labels.instance }}, has been above 92% for the last 15 minutes, is currently at {{ printf "%.2f\" $value }}%.
 EOT
       runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodememoryhighutilization"
       summary     = "Host is running out of memory."
