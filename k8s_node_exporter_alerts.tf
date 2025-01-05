@@ -1,6 +1,6 @@
 resource "grafana_rule_group" "node_exporter_alerts"  {
   count           = var.node_exporter_alerts_enabled ? 1 : 0
-  name             = "node_filesystem_space_filling_up"
+  name             = "node_exporter_alerts"
   folder_uid       = grafana_folder.prometheus_alerts.uid
   interval_seconds = var.alert_interval_seconds
 
