@@ -707,7 +707,7 @@ EOT
       datasource_uid = var.datasource_uid
       model = jsonencode({
         "editorMode"    = "code",
-        "expr"          = "sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode!=\"idle\"}[2m]))) * 100 > 96",
+        "expr"          = "sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode!=\"idle\"}[2m]))) * 100 > 99",
         "intervalMs"    = 1000,
         "maxDataPoints" = 43200,
         "instant"       = true,
@@ -720,7 +720,7 @@ EOT
     }
 
     annotations = {
-      description = "CPU usage at {{ $labels.instance }} has been above 96% for the last 15 minutes, is currently at {{ printf \"%.2f\" $value }}%."
+      description = "CPU usage at {{ $labels.instance }} has been above 99% for the last 15 minutes, is currently at {{ printf \"%.2f\" $value }}%."
       runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodecpuhighusage"
       summary     = "High CPU usage."
     }
@@ -757,7 +757,7 @@ EOT
 
     annotations = {
       description = <<EOT
-System load per core at {{ $labels.instance }} has been above 2 for the last 15 minutes, is currently at {{ printf "%.2f" $value }}.
+System load per core at {{ $labels.instance }} has been above 5 for the last 15 minutes, is currently at {{ printf "%.2f" $value }}.
 This might indicate this instance resources saturation and can cause it becoming unresponsive.
 EOT
       runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/node/nodesystemsaturation"
