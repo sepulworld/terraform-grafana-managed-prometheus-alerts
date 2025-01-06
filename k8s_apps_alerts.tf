@@ -752,16 +752,16 @@ EOT
       model = jsonencode({
         "editorMode"    = "code",
         "expr"          = <<EOT
-kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~".*"}
+max(kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~".*"})
   ==
-kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics", namespace=~".*"}
+max(kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics", namespace=~".*"})
 EOT
         "intervalMs"    = 1000,
         "maxDataPoints" = 43200,
         "refId"         = "A"
       })
       relative_time_range {
-        from = 300
+        from = 900
         to   = 0
       }
     }
