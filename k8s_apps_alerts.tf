@@ -47,55 +47,54 @@ EOT
     }
   }
 
-  # KubePodNotReady Alert
-  rule {
-    name      = "KubePodNotReady"
-    condition = "A"
+rule {
+  name      = "KubePodNotReady"
+  condition = "A"
 
-    # Data Query
-    data {
-      ref_id         = "A"
-      datasource_uid = var.datasource_uid
-      model = jsonencode({
-        "editorMode"    = "code",
-        "expr"          = <<EOT
-sum by (namespace, pod, cluster) (
-  max by (namespace, pod, cluster) (
+  # Data Query
+  data {
+    ref_id         = "A"
+    datasource_uid = var.datasource_uid
+    model = jsonencode({
+      "editorMode"    = "code",
+      "expr"          = <<EOT
+sum by (namespace, pod) (
+  max by (namespace, pod) (
     kube_pod_status_phase{job="kube-state-metrics", namespace=~".*", phase=~"Pending|Unknown|Failed"}
-  ) * on (namespace, pod, cluster) group_left(owner_kind) topk by (namespace, pod, cluster) (
-    1, max by (namespace, pod, owner_kind, cluster) (kube_pod_owner{owner_kind!="Job"})
+  ) * on (namespace, pod) group_left(owner_kind) topk by (namespace, pod) (
+    1, max by (namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
   )
 ) > 0
 EOT
-        "intervalMs"    = 1000,
-        "maxDataPoints" = 43200,
-        "refId"         = "A"
-      })
-      relative_time_range {
-        from = 300 # Last 5 minutes
-        to   = 0
-      }
-    }
-
-    annotations = {
-      description = "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 15 minutes."
-      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepodnotready"
-      summary     = "Pod has been in a non-ready state for more than 15 minutes."
-    }
-
-    labels = {
-      severity = "warning"
-    }
-
-    no_data_state = "OK"
-    for = "15m"
-
-    notification_settings {
-      contact_point = var.notification_settings.contact_point
-      group_by      = ["namespace", "pod"]
-      mute_timings  = var.notification_settings.mute_timings
+      "intervalMs"    = 1000,
+      "maxDataPoints" = 43200,
+      "refId"         = "A"
+    })
+    relative_time_range {
+      from = 900 # Last 5 minutes
+      to   = 0
     }
   }
+
+  annotations = {
+    description = "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 15 minutes."
+    runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepodnotready"
+    summary     = "Pod has been in a non-ready state for more than 15 minutes."
+  }
+
+  labels = {
+    severity = "warning"
+  }
+
+  no_data_state = "OK"
+  for = "15m"
+
+  notification_settings {
+    contact_point = var.notification_settings.contact_point
+    group_by      = ["namespace", "pod"]
+    mute_timings  = var.notification_settings.mute_timings
+  }
+}
 
     # KubeDeploymentGenerationMismatch Alert
   rule {
@@ -118,7 +117,7 @@ EOT
         "refId"         = "A"
       })
       relative_time_range {
-        from = 300 # Last 5 minutes
+        from = 900 # Last 5 minutes
         to   = 0
       }
     }
