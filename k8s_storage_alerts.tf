@@ -16,13 +16,13 @@ resource "grafana_rule_group" "kube_persistent_volume_alerts" {
       model = jsonencode({
         "editorMode"    = "code",
         "expr"          = <<EOT
-(
+avg(
   kubelet_volume_stats_available_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
     /
   kubelet_volume_stats_capacity_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
 ) < 0.03
 and
-kubelet_volume_stats_used_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"} > 0
+avg(kubelet_volume_stats_used_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}) > 0
 unless on (cluster, namespace, persistentvolumeclaim)
 kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
 unless on (cluster, namespace, persistentvolumeclaim)
@@ -70,15 +70,15 @@ EOT
       model = jsonencode({
         "editorMode"    = "code",
         "expr"          = <<EOT
-(
+avg(
   kubelet_volume_stats_available_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
     /
   kubelet_volume_stats_capacity_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
 ) < 0.15
 and
-kubelet_volume_stats_used_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"} > 0
+avg(kubelet_volume_stats_used_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}) > 0
 and
-predict_linear(kubelet_volume_stats_available_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}[6h], 4 * 24 * 3600) < 0
+avg(predict_linear(kubelet_volume_stats_available_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}[6h], 4 * 24 * 3600)) < 0
 unless on (cluster, namespace, persistentvolumeclaim)
 kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
 unless on (cluster, namespace, persistentvolumeclaim)
