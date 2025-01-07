@@ -452,49 +452,63 @@ EOT
     }
   }
 
-  # KubeContainerWaiting Alert
   rule {
-    name      = "KubeContainerWaiting"
-    condition = "A"
+    name      = "Test"
+    condition = "C"
 
-    # Data Query
     data {
-      ref_id         = "A"
-      datasource_uid = var.datasource_uid
-      model = jsonencode({
-        "editorMode"    = "code",
-        "expr"          = <<EOT
-kube_pod_container_status_waiting_reason{job="kube-state-metrics", namespace=~".*"} > 0
-EOT
-        "intervalMs"    = 1000,
-        "maxDataPoints" = 43200,
-        "refId"         = "A"
-      })
+      ref_id = "A"
+
       relative_time_range {
-        from = 3600 # Last 1 hour
+        from = 600
         to   = 0
       }
+
+      datasource_uid = data.grafana_data_source.prometheus.uid 
+      model          = "{\"editorMode\":\"code\",\"expr\":\"sum by (namespace, pod) (kube_pod_container_status_waiting_reason{job=\\\"kube-state-metrics\\\",\\n        namespace=~\\\".*\\\"}) > 0\",\"instant\":true,\"intervalMs\":1000,\"legendFormat\":\"__auto\",\"maxDataPoints\":43200,\"range\":false,\"refId\":\"A\"}"
+    }
+    data {
+      ref_id = "B"
+
+      relative_time_range {
+        from = 600
+        to   = 0
+      }
+
+      datasource_uid = "__expr__"
+      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"B\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"A\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"reducer\":\"last\",\"refId\":\"B\",\"type\":\"reduce\"}"
+    }
+    data {
+      ref_id = "C"
+
+      relative_time_range {
+        from = 600
+        to   = 0
+      }
+
+      datasource_uid = "__expr__"
+      model          = "{\"conditions\":[{\"evaluator\":{\"params\":[0],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"C\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"B\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"refId\":\"C\",\"type\":\"threshold\"}"
     }
 
-    annotations = {
-      description = "pod/{{ $labels.pod }} in namespace {{ $labels.namespace }} on container {{ $labels.container }} has been in waiting state for longer than 1 hour."
-      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubecontainerwaiting"
-      summary     = "Pod container waiting longer than 1 hour."
-    }
-
-    labels = {
-      severity = "warning"
-    }
-
-    no_data_state = "OK"
-    for           = "1h"
-
-    notification_settings {
-      contact_point = var.notification_settings.contact_point
-      group_by      = ["namespace", "pod", "container"]
-      mute_timings  = var.notification_settings.mute_timings
-    }
+  annotations = {
+    description = "Container {{ $labels.container }} in pod {{ $labels.pod }} (namespace {{ $labels.namespace }}) has been in a waiting state for more than 1 hour."
+    runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubecontainerwaiting"
+    summary     = "Pod container waiting longer than 1 hour."
   }
+
+  labels = {
+    severity = "warning"
+  }
+
+  no_data_state = "OK"
+  for           = "1h"
+
+  notification_settings {
+    contact_point = var.notification_settings.contact_point
+    group_by      = ["namespace", "pod", "container"]
+    mute_timings  = var.notification_settings.mute_timings
+  }
+}
 
     rule {
     name      = "KubeDaemonSetNotScheduled"
