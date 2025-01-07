@@ -464,7 +464,7 @@ EOT
         to   = 0
       }
 
-      datasource_uid = data.grafana_data_source.prometheus.uid 
+      datasource_uid = var.datasource_uid
       model          = "{\"editorMode\":\"code\",\"expr\":\"sum by (namespace, pod) (kube_pod_container_status_waiting_reason{job=\\\"kube-state-metrics\\\",\\n        namespace=~\\\".*\\\"}) > 0\",\"instant\":true,\"intervalMs\":1000,\"legendFormat\":\"__auto\",\"maxDataPoints\":43200,\"range\":false,\"refId\":\"A\"}"
     }
     data {
