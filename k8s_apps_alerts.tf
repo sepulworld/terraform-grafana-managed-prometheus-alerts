@@ -453,7 +453,7 @@ EOT
   }
 
   rule {
-    name      = "Test"
+    name      = "KubeContainerWaiting"
     condition = "C"
 
     data {
