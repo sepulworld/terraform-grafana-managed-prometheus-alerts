@@ -4,12 +4,11 @@ resource "grafana_rule_group" "kube_persistent_volume_alerts" {
   folder_uid       = grafana_folder.prometheus_alerts.uid
   interval_seconds = var.alert_interval_seconds
 
-  # Critical Alert: PersistentVolume is filling up
   rule {
     name      = "KubePersistentVolumeFillingUpCritical"
-    condition = "A"
+    condition = "B"
 
-    # Data Query
+    # Data Query A - Aggregation
     data {
       ref_id         = "A"
       datasource_uid = var.datasource_uid
@@ -20,11 +19,11 @@ avg(
   kubelet_volume_stats_available_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
     /
   kubelet_volume_stats_capacity_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
-) < 0.03
+)
 and
 avg(kubelet_volume_stats_used_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}) > 0
 unless on (cluster, namespace, persistentvolumeclaim)
-kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
+kube_persistentvolumeclaim_access_mode{access_mode="ReadOnlyMany"} == 1
 unless on (cluster, namespace, persistentvolumeclaim)
 kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
 EOT
@@ -33,9 +32,36 @@ EOT
         "refId"         = "A"
       })
       relative_time_range {
-        from = 300
+        from = 300 # Last 5 minutes
         to   = 0
       }
+    }
+
+    # Threshold Query B - Apply Condition
+    data {
+      ref_id         = "B"
+      datasource_uid = "__expr__"
+      relative_time_range {
+        from = 300 # Last 5 minutes
+        to   = 0
+      }
+      model = jsonencode({
+        "conditions" = [
+          {
+            "evaluator" = { "params" = [0.03], "type" = "lt" }, # Threshold: < 0.03
+            "operator"  = { "type" = "and" },
+            "query"     = { "params" = ["A"] }, # Reference Query A
+            "reducer"   = { "params" = [], "type" = "last" },
+            "type"      = "query"
+          }
+        ],
+        "datasource"    = { "type" = "__expr__", "uid" = "__expr__" },
+        "expression"    = "A",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "B",
+        "type"          = "threshold"
+      })
     }
 
     annotations = {
@@ -49,7 +75,7 @@ EOT
     }
 
     no_data_state = "OK"
-    for           = "1m"
+    for           = "5m"
 
     notification_settings {
       contact_point = var.notification_settings.contact_point
@@ -58,12 +84,12 @@ EOT
     }
   }
 
-  # Warning Alert: PersistentVolume predicted to fill up
+
   rule {
     name      = "KubePersistentVolumeFillingUpWarning"
-    condition = "A"
+    condition = "B"
 
-    # Data Query
+    # Data Query A - Aggregation
     data {
       ref_id         = "A"
       datasource_uid = var.datasource_uid
@@ -74,7 +100,7 @@ avg(
   kubelet_volume_stats_available_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
     /
   kubelet_volume_stats_capacity_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
-) < 0.15
+)
 and
 avg(kubelet_volume_stats_used_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}) > 0
 and
@@ -89,9 +115,36 @@ EOT
         "refId"         = "A"
       })
       relative_time_range {
-        from = 300
+        from = 300 # Last 5 minutes
         to   = 0
       }
+    }
+
+    # Threshold Query B - Apply Condition
+    data {
+      ref_id         = "B"
+      datasource_uid = "__expr__"
+      relative_time_range {
+        from = 300 # Last 5 minutes
+        to   = 0
+      }
+      model = jsonencode({
+        "conditions" = [
+          {
+            "evaluator" = { "params" = [0.15], "type" = "lt" }, # Threshold: < 0.15
+            "operator"  = { "type" = "and" },
+            "query"     = { "params" = ["A"] }, # Reference Query A
+            "reducer"   = { "params" = [], "type" = "last" },
+            "type"      = "query"
+          }
+        ],
+        "datasource"    = { "type" = "__expr__", "uid" = "__expr__" },
+        "expression"    = "A",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "B",
+        "type"          = "threshold"
+      })
     }
 
     annotations = {
@@ -114,12 +167,11 @@ EOT
     }
   }
 
-    # Critical Alert: PersistentVolume inodes filling up
   rule {
     name      = "KubePersistentVolumeInodesFillingUpCritical"
-    condition = "A"
+    condition = "B"
 
-    # Data Query
+    # Data Query A - Aggregation
     data {
       ref_id         = "A"
       datasource_uid = var.datasource_uid
@@ -130,7 +182,7 @@ EOT
   kubelet_volume_stats_inodes_free{job="kubelet", namespace=~".*", metrics_path="/metrics"}
     /
   kubelet_volume_stats_inodes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
-) < 0.03
+)
 and
 kubelet_volume_stats_inodes_used{job="kubelet", namespace=~".*", metrics_path="/metrics"} > 0
 unless on (cluster, namespace, persistentvolumeclaim)
@@ -143,9 +195,36 @@ EOT
         "refId"         = "A"
       })
       relative_time_range {
-        from = 300
+        from = 300 # Last 5 minutes
         to   = 0
       }
+    }
+
+    # Threshold Query B - Apply Condition
+    data {
+      ref_id         = "B"
+      datasource_uid = "__expr__"
+      relative_time_range {
+        from = 300 # Last 5 minutes
+        to   = 0
+      }
+      model = jsonencode({
+        "conditions" = [
+          {
+            "evaluator" = { "params" = [0.03], "type" = "lt" }, # Threshold: < 0.03
+            "operator"  = { "type" = "and" },
+            "query"     = { "params" = ["A"] }, # Reference Query A
+            "reducer"   = { "params" = [], "type" = "last" },
+            "type"      = "query"
+          }
+        ],
+        "datasource"    = { "type" = "__expr__", "uid" = "__expr__" },
+        "expression"    = "A",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "B",
+        "type"          = "threshold"
+      })
     }
 
     annotations = {
@@ -168,12 +247,12 @@ EOT
     }
   }
 
-  # Warning Alert: PersistentVolume inodes predicted to fill up
+
   rule {
     name      = "KubePersistentVolumeInodesFillingUpWarning"
-    condition = "A"
+    condition = "B"
 
-    # Data Query
+    # Data Query A - Aggregation
     data {
       ref_id         = "A"
       datasource_uid = var.datasource_uid
@@ -184,7 +263,7 @@ EOT
   kubelet_volume_stats_inodes_free{job="kubelet", namespace=~".*", metrics_path="/metrics"}
     /
   kubelet_volume_stats_inodes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
-) < 0.15
+)
 and
 kubelet_volume_stats_inodes_used{job="kubelet", namespace=~".*", metrics_path="/metrics"} > 0
 and
@@ -199,9 +278,36 @@ EOT
         "refId"         = "A"
       })
       relative_time_range {
-        from = 300
+        from = 300 # Last 5 minutes
         to   = 0
       }
+    }
+
+    # Threshold Query B - Apply Condition
+    data {
+      ref_id         = "B"
+      datasource_uid = "__expr__"
+      relative_time_range {
+        from = 300 # Last 5 minutes
+        to   = 0
+      }
+      model = jsonencode({
+        "conditions" = [
+          {
+            "evaluator" = { "params" = [0.15], "type" = "lt" }, # Threshold: < 0.15
+            "operator"  = { "type" = "and" },
+            "query"     = { "params" = ["A"] }, # Reference Query A
+            "reducer"   = { "params" = [], "type" = "last" },
+            "type"      = "query"
+          }
+        ],
+        "datasource"    = { "type" = "__expr__", "uid" = "__expr__" },
+        "expression"    = "A",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "B",
+        "type"          = "threshold"
+      })
     }
 
     annotations = {
@@ -223,11 +329,12 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+
   rule {
     name      = "KubePersistentVolumeErrors"
-    condition = "A"
+    condition = "B"
 
-    # Data Query
+    # Data Query A - Raw Metric Query
     data {
       ref_id         = "A"
       datasource_uid = var.datasource_uid
@@ -241,9 +348,36 @@ EOT
         "refId"         = "A"
       })
       relative_time_range {
-        from = 300
+        from = 300 # Last 5 minutes
         to   = 0
       }
+    }
+
+    # Threshold Query B - Apply Condition
+    data {
+      ref_id         = "B"
+      datasource_uid = "__expr__"
+      relative_time_range {
+        from = 300 # Last 5 minutes
+        to   = 0
+      }
+      model = jsonencode({
+        "conditions" = [
+          {
+            "evaluator" = { "params" = [0], "type" = "gt" }, # Threshold: > 0
+            "operator"  = { "type" = "and" },
+            "query"     = { "params" = ["A"] }, # Reference Query A
+            "reducer"   = { "params" = [], "type" = "last" },
+            "type"      = "query"
+          }
+        ],
+        "datasource"    = { "type" = "__expr__", "uid" = "__expr__" },
+        "expression"    = "A",
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "B",
+        "type"          = "threshold"
+      })
     }
 
     annotations = {
@@ -258,7 +392,7 @@ EOT
 
     no_data_state  = "OK"
     exec_err_state = "OK"
-    for           = "5m"
+    for            = "5m"
 
     notification_settings {
       contact_point = var.notification_settings.contact_point
