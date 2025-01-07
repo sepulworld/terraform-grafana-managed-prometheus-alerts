@@ -419,10 +419,7 @@ EOT
     kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics", namespace=~".*"}
   )
 ) and (
-  changes(kube_daemonset_status_updated_number_scheduled{job="kube-state-metrics", namespace=~".*"}[5m])
-    by (namespace, daemonset)
-    ==
-  0
+  changes(kube_daemonset_status_updated_number_scheduled{job="kube-state-metrics", namespace=~".*"}[5m]) == 0
 )
 EOT
         "intervalMs"    = 1000,
