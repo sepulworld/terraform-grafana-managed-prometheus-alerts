@@ -16,18 +16,19 @@ resource "grafana_rule_group" "kube_persistent_volume_alerts" {
         "editorMode"    = "code",
         "expr"          = <<EOT
 avg by (namespace, persistentvolumeclaim) (
-  kubelet_volume_stats_available_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
+  kubelet_volume_stats_inodes_free{job="kubelet", namespace=~".*", metrics_path="/metrics"}
     /
-  kubelet_volume_stats_capacity_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
+  kubelet_volume_stats_inodes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
 )
 and
 avg by (namespace, persistentvolumeclaim) (
-  kubelet_volume_stats_used_bytes{job="kubelet", namespace=~".*", metrics_path="/metrics"}
+  kubelet_volume_stats_inodes_used{job="kubelet", namespace=~".*", metrics_path="/metrics"}
 ) > 0
 unless on (namespace, persistentvolumeclaim)
 kube_persistentvolumeclaim_access_mode{access_mode="ReadOnlyMany"} == 1
 unless on (namespace, persistentvolumeclaim)
 kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
+
 EOT
         "intervalMs"    = 1000,
         "maxDataPoints" = 43200,
