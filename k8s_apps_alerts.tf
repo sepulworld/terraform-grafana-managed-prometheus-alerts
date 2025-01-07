@@ -39,7 +39,7 @@ EOT
     }
 
     no_data_state = "OK"
-    for = "15m"
+    for           = "15m"
     notification_settings {
       contact_point = var.notification_settings.contact_point
       group_by      = ["namespace", "pod", "container"]
@@ -47,17 +47,17 @@ EOT
     }
   }
 
-rule {
-  name      = "KubePodNotReady"
-  condition = "A"
+  rule {
+    name      = "KubePodNotReady"
+    condition = "A"
 
-  # Data Query
-  data {
-    ref_id         = "A"
-    datasource_uid = var.datasource_uid
-    model = jsonencode({
-      "editorMode"    = "code",
-      "expr"          = <<EOT
+    # Data Query
+    data {
+      ref_id         = "A"
+      datasource_uid = var.datasource_uid
+      model = jsonencode({
+        "editorMode"    = "code",
+        "expr"          = <<EOT
 sum by (namespace, pod) (
   max by (namespace, pod) (
     kube_pod_status_phase{job="kube-state-metrics", namespace=~".*", phase=~"Pending|Unknown|Failed"}
@@ -66,37 +66,37 @@ sum by (namespace, pod) (
   )
 ) > 0
 EOT
-      "intervalMs"    = 1000,
-      "maxDataPoints" = 43200,
-      "refId"         = "A"
-    })
-    relative_time_range {
-      from = 900 # Last 5 minutes
-      to   = 0
+        "intervalMs"    = 1000,
+        "maxDataPoints" = 43200,
+        "refId"         = "A"
+      })
+      relative_time_range {
+        from = 900 # Last 5 minutes
+        to   = 0
+      }
+    }
+
+    annotations = {
+      description = "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 15 minutes."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepodnotready"
+      summary     = "Pod has been in a non-ready state for more than 15 minutes."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "15m"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "pod"]
+      mute_timings  = var.notification_settings.mute_timings
     }
   }
 
-  annotations = {
-    description = "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready state for longer than 15 minutes."
-    runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepodnotready"
-    summary     = "Pod has been in a non-ready state for more than 15 minutes."
-  }
-
-  labels = {
-    severity = "warning"
-  }
-
-  no_data_state = "OK"
-  for = "15m"
-
-  notification_settings {
-    contact_point = var.notification_settings.contact_point
-    group_by      = ["namespace", "pod"]
-    mute_timings  = var.notification_settings.mute_timings
-  }
-}
-
-    # KubeDeploymentGenerationMismatch Alert
+  # KubeDeploymentGenerationMismatch Alert
   rule {
     name      = "KubeDeploymentGenerationMismatch"
     condition = "A"
@@ -133,7 +133,7 @@ EOT
     }
 
     no_data_state = "OK"
-    for = "15m"
+    for           = "15m"
 
     notification_settings {
       contact_point = var.notification_settings.contact_point
@@ -185,7 +185,7 @@ EOT
     }
 
     no_data_state = "OK"
-    for = "15m"
+    for           = "15m"
 
     notification_settings {
       contact_point = var.notification_settings.contact_point
@@ -194,7 +194,7 @@ EOT
     }
   }
 
-    rule {
+  rule {
     name      = "KubeDeploymentRolloutStuck"
     condition = "A"
 
@@ -285,7 +285,7 @@ EOT
     }
   }
 
-    rule {
+  rule {
     name      = "KubeStatefulSetGenerationMismatch"
     condition = "A"
 
@@ -490,27 +490,27 @@ EOT
       model          = "{\"conditions\":[{\"evaluator\":{\"params\":[0],\"type\":\"gt\"},\"operator\":{\"type\":\"and\"},\"query\":{\"params\":[\"C\"]},\"reducer\":{\"params\":[],\"type\":\"last\"},\"type\":\"query\"}],\"datasource\":{\"type\":\"__expr__\",\"uid\":\"__expr__\"},\"expression\":\"B\",\"intervalMs\":1000,\"maxDataPoints\":43200,\"refId\":\"C\",\"type\":\"threshold\"}"
     }
 
-  annotations = {
-    description = "Container {{ $labels.container }} in pod {{ $labels.pod }} (namespace {{ $labels.namespace }}) has been in a waiting state for more than 1 hour."
-    runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubecontainerwaiting"
-    summary     = "Pod container waiting longer than 1 hour."
+    annotations = {
+      description = "Container {{ $labels.container }} in pod {{ $labels.pod }} (namespace {{ $labels.namespace }}) has been in a waiting state for more than 1 hour."
+      runbook_url = "https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubecontainerwaiting"
+      summary     = "Pod container waiting longer than 1 hour."
+    }
+
+    labels = {
+      severity = "warning"
+    }
+
+    no_data_state = "OK"
+    for           = "1h"
+
+    notification_settings {
+      contact_point = var.notification_settings.contact_point
+      group_by      = ["namespace", "pod", "container"]
+      mute_timings  = var.notification_settings.mute_timings
+    }
   }
 
-  labels = {
-    severity = "warning"
-  }
-
-  no_data_state = "OK"
-  for           = "1h"
-
-  notification_settings {
-    contact_point = var.notification_settings.contact_point
-    group_by      = ["namespace", "pod", "container"]
-    mute_timings  = var.notification_settings.mute_timings
-  }
-}
-
-    rule {
+  rule {
     name      = "KubeDaemonSetNotScheduled"
     condition = "A"
 
@@ -599,7 +599,7 @@ EOT
     }
   }
 
-    rule {
+  rule {
     name      = "KubeJobNotCompleted"
     condition = "A"
 
@@ -705,29 +705,34 @@ EOT
     !=
   kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~".*"}
 )
-  and
+and
 (
   kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~".*"}
     >
   kube_horizontalpodautoscaler_spec_min_replicas{job="kube-state-metrics", namespace=~".*"}
 )
-  and
+and
 (
   kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~".*"}
     <
   kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics", namespace=~".*"}
 )
-  and
+and
 (
   changes(kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~".*"}[15m]) == 0
 )
+and
+on(namespace, horizontalpodautoscaler)
+avg by (namespace, horizontalpodautoscaler) (
+  kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics"}
+) > 0
 EOT
         "intervalMs"    = 1000,
         "maxDataPoints" = 43200,
         "refId"         = "A"
       })
       relative_time_range {
-        from = 300
+        from = 300 # Last 5 minutes
         to   = 0
       }
     }
@@ -751,6 +756,7 @@ EOT
       mute_timings  = var.notification_settings.mute_timings
     }
   }
+
 
   # KubeHpaMaxedOut Alert
   rule {
