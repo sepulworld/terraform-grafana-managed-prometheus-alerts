@@ -402,24 +402,25 @@ EOT
         "expr"          = <<EOT
 (
   (
-    kube_daemonset_status_current_number_scheduled{job="kube-state-metrics", namespace=~".*"}
+    kube_daemonset_status_current_number_scheduled{job="kube-state-metrics", namespace=~".*", instance=~".*"}
      !=
-    kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics", namespace=~".*"}
+    kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics", namespace=~".*", instance=~".*"}
   ) or (
-    kube_daemonset_status_number_misscheduled{job="kube-state-metrics", namespace=~".*"}
+    kube_daemonset_status_number_misscheduled{job="kube-state-metrics", namespace=~".*", instance=~".*"}
      !=
     0
   ) or (
-    kube_daemonset_status_updated_number_scheduled{job="kube-state-metrics", namespace=~".*"}
+    kube_daemonset_status_updated_number_scheduled{job="kube-state-metrics", namespace=~".*", instance=~".*"}
      !=
     kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics", namespace=~".*"}
   ) or (
-    kube_daemonset_status_number_available{job="kube-state-metrics", namespace=~".*"}
+    kube_daemonset_status_number_available{job="kube-state-metrics", namespace=~".*", instance=~".*"}
      !=
     kube_daemonset_status_desired_number_scheduled{job="kube-state-metrics", namespace=~".*"}
   )
 ) and (
   changes(kube_daemonset_status_updated_number_scheduled{job="kube-state-metrics", namespace=~".*"}[5m])
+    by (namespace, daemonset)
     ==
   0
 )
