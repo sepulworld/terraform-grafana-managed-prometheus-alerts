@@ -464,7 +464,7 @@ EOT
       model = jsonencode({
         "editorMode"    = "code",
         "expr"          = <<EOT
-sum by (namespace, pod, container, cluster) (kube_pod_container_status_waiting_reason{job="kube-state-metrics", namespace=~".*"}) > 0
+kube_pod_container_status_waiting_reason{job="kube-state-metrics", namespace=~".*"} > 0
 EOT
         "intervalMs"    = 1000,
         "maxDataPoints" = 43200,
