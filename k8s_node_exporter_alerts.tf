@@ -698,7 +698,7 @@ EOT
   }
 
     rule {
-    name      = "NodeCPUHighUsageInfo"
+    name      = "NodeCPUPeggedInfo"
     condition = "A"
 
     # Data Query
@@ -707,7 +707,7 @@ EOT
       datasource_uid = var.datasource_uid
       model = jsonencode({
         "editorMode"    = "code",
-        "expr"          = "sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode!=\"idle\"}[2m]))) * 100 > 99",
+        "expr"          = "sum without(mode) (avg without (cpu) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode!=\"idle\"}[2m]))) * 100 > 99.9999",
         "intervalMs"    = 1000,
         "maxDataPoints" = 43200,
         "instant"       = true,
